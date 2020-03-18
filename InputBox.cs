@@ -27,7 +27,7 @@ namespace AppPathMan
         {
             get;
             set;
-        }
+        } = "";
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -48,7 +48,7 @@ namespace AppPathMan
         private void InputBox_Load(object sender, EventArgs e)
         {
             textBox1.Text = "";
-            textBox1_TextChanged(this, null);
+            textBox1_TextChanged(this, e);
 
         }
     }

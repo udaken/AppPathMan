@@ -17,7 +17,7 @@ namespace AppPathMan
         static readonly PropertyChangedEventArgs _ValuePropertyChangedArgs = new PropertyChangedEventArgs(nameof(Value));
         RegSz _Path;
         static readonly PropertyChangedEventArgs _PathPropertyChangedArgs = new PropertyChangedEventArgs(nameof(Path));
-        string _DropTarget;
+        string? _DropTarget;
         static readonly PropertyChangedEventArgs _DropTargetPropertyChangedArgs = new PropertyChangedEventArgs(nameof(DropTarget));
         uint? _UseUrl;
         static readonly PropertyChangedEventArgs _UseUrlPropertyChangedArgs = new PropertyChangedEventArgs(nameof(UseUrl));
@@ -26,9 +26,9 @@ namespace AppPathMan
 
         bool _disposed = false;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        AppPathInfo(bool isSystem, string name, RegSz value = default, RegSz path = default, uint? useUrl = null, string dropTarget = default, uint? dontUseDesktopChangeRouter = default)
+        AppPathInfo(bool isSystem, string name, RegSz value = default, RegSz path = default, uint? useUrl = null, string? dropTarget = default, uint? dontUseDesktopChangeRouter = default)
         {
             IsSystem = isSystem;
             _Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -94,7 +94,7 @@ namespace AppPathMan
             }
         }
 
-        public string DropTarget
+        public string? DropTarget
         {
             get => _DropTarget;
             set
@@ -160,18 +160,18 @@ namespace AppPathMan
             return rootKey.OpenSubKey(name, true);
         }
 
-        void UpdateValueCore<T>(string name, T value, Func<T, (object value, RegistryValueKind kind)> converter)
+        void UpdateValueCore<T>(string name, T value, Func<T, (object? value, RegistryValueKind kind)> converter)
         {
             using var key = OpenRegKeyForWrite(AppPathKeyName + @"\" + Name);
 
-            var tmp = converter(value);
-            if (tmp.value == null)
+            var converted = converter(value);
+            if (converted.value == null)
             {
                 if (ValueExist(key, name))
                     key.DeleteValue(name);
             }
             else
-                key.SetValue(name, tmp.value, tmp.kind);
+                key.SetValue(name, converted.value, converted.kind);
         }
 
         void UpdateValue(string name, RegSz value)
@@ -179,7 +179,7 @@ namespace AppPathMan
             UpdateValueCore(name, value, v => (v.Value, v.IsExpandString ? RegistryValueKind.ExpandString : RegistryValueKind.String));
         }
 
-        void UpdateValue(string name, string value)
+        void UpdateValue(string name, string? value)
         {
             UpdateValueCore(name, value, v => (v, RegistryValueKind.String));
         }
@@ -194,7 +194,7 @@ namespace AppPathMan
         static bool ValueExist(RegistryKey key, string name) => key.GetValueNames().Contains(name, StringComparer.InvariantCultureIgnoreCase);
 
         static RegSz GetRegSz(RegistryKey key, string name) => new RegSz(
-            key.GetValue(name, "", RegistryValueOptions.DoNotExpandEnvironmentNames) as string,
+            (string)key.GetValue(name, "", RegistryValueOptions.DoNotExpandEnvironmentNames),
             ValueExist(key, name) && key.GetValueKind(name) == RegistryValueKind.ExpandString);
 
 
@@ -226,7 +226,7 @@ namespace AppPathMan
         public bool Equals(AppPathInfo info)
             => IsSystem == info.IsSystem && Name == info.Name && Value.Equals(info.Value) && Path.Equals(info.Path) && DropTarget == info.DropTarget && UseUrl == info.UseUrl && DontUseDesktopChangeRouter == info.DontUseDesktopChangeRouter;
 
-        public override bool Equals(object obj) => obj is AppPathInfo info && Equals(info);
+        public override bool Equals(object? obj) => obj is AppPathInfo info && Equals(info);
 
         public override int GetHashCode()
             => HashCode.Combine(IsSystem, Name, Value, Path, DropTarget, UseUrl, DontUseDesktopChangeRouter);

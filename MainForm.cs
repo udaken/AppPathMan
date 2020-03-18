@@ -9,16 +9,17 @@ namespace AppPathMan
 {
     public partial class MainForm : Form
     {
-        AppPathModel _Model;
+        readonly AppPathModel _Model;
         public MainForm()
         {
-
+            _Model = new AppPathModel(Model_AppPathKeyNotFoundEvent);
             InitializeComponent();
             dataGridView1.AutoGenerateColumns = false;
+            appPathModelBindingSource.DataSource = _Model;
 
         }
 
-        private void Model_AppPathKeyNotFoundEvent(object sender, AppPathKeyNotFoundEventArgs e)
+        private void Model_AppPathKeyNotFoundEvent(object? sender, AppPathKeyNotFoundEventArgs e)
         {
             if (MessageBox.Show(this, "`App Paths` key not found. Create Key?\n" + e.KeyName, this.Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
@@ -109,8 +110,6 @@ namespace AppPathMan
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            _Model = new AppPathModel(Model_AppPathKeyNotFoundEvent);
-            appPathModelBindingSource.DataSource = _Model;
 
         }
     }

@@ -15,11 +15,11 @@ namespace AppPathMan
         bool _IsSystem = false;
         static readonly PropertyChangedEventArgs _IsSystemPropertyChangedArgs = new PropertyChangedEventArgs(nameof(IsSystem));
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public event EventHandler<AppPathKeyNotFoundEventArgs> AppPathKeyNotFoundEvent;
+        public event EventHandler<AppPathKeyNotFoundEventArgs>? AppPathKeyNotFoundEvent;
 
-        public AppPathModel(EventHandler<AppPathKeyNotFoundEventArgs> appPathKeyNotFoundEvent = null)
+        public AppPathModel(EventHandler<AppPathKeyNotFoundEventArgs>? appPathKeyNotFoundEvent = null)
         {
             AppPathKeyNotFoundEvent = appPathKeyNotFoundEvent;
             CopyTo(Load(), List);
@@ -62,6 +62,9 @@ namespace AppPathMan
                         appPathKey = rootKey.CreateSubKey(AppPathInfo.AppPathKeyName);
                 }
 
+                if (appPathKey == null)
+                    throw new InvalidOperationException();
+
                 var list = new List<AppPathInfo>();
                 foreach (var name in appPathKey.GetSubKeyNames())
                 {
@@ -81,7 +84,7 @@ namespace AppPathMan
             }
         }
 
-        public string Export(string filename)
+        public string? Export(string filename)
         {
             var startInfo = new ProcessStartInfo(Environment.ExpandEnvironmentVariables(@"%WINDIR%\system32\reg.exe"))
             {
