@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AppPathMan": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false,
+      "remoteDebugMachine": "VMWARE-0THO6IGII1"
+    }
+  }
+}

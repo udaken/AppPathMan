@@ -197,20 +197,6 @@ namespace AppPathMan
             key.GetValue(name, "", RegistryValueOptions.DoNotExpandEnvironmentNames) as string,
             ValueExist(key, name) && key.GetValueKind(name) == RegistryValueKind.ExpandString);
 
-        public static List<AppPathInfo> Load(bool isSystem)
-        {
-            var rootKey = isSystem ? Registry.LocalMachine : Registry.CurrentUser;
-            using var appPathKey = rootKey.OpenSubKey(AppPathKeyName);
-
-            var list = new List<AppPathInfo>();
-            foreach (var name in appPathKey.GetSubKeyNames())
-            {
-                using var key = appPathKey.OpenSubKey(name);
-                list.Add(FromReg(isSystem, key, name));
-            }
-
-            return list;
-        }
 
         public static AppPathInfo Create(bool isSystem, string name, RegSz value = default, RegSz path = default, uint? useUrl = null)
         {
@@ -224,7 +210,7 @@ namespace AppPathMan
             return info;
         }
 
-        static AppPathInfo FromReg(bool isSystem, RegistryKey key, string name)
+        public static AppPathInfo FromReg(bool isSystem, RegistryKey key, string name)
         {
             var value = GetRegSz(key, DefaultValueName);
             if (value.Value == null)
@@ -239,14 +225,14 @@ namespace AppPathMan
 
         public bool Equals(AppPathInfo info)
             => IsSystem == info.IsSystem && Name == info.Name && Value.Equals(info.Value) && Path.Equals(info.Path) && DropTarget == info.DropTarget && UseUrl == info.UseUrl && DontUseDesktopChangeRouter == info.DontUseDesktopChangeRouter;
-        
+
         public override bool Equals(object obj) => obj is AppPathInfo info && Equals(info);
 
         public override int GetHashCode()
             => HashCode.Combine(IsSystem, Name, Value, Path, DropTarget, UseUrl, DontUseDesktopChangeRouter);
 
         public static bool operator ==(AppPathInfo left, AppPathInfo right) => EqualityComparer<AppPathInfo>.Default.Equals(left, right);
-        
+
         public static bool operator !=(AppPathInfo left, AppPathInfo right) => !(left == right);
     }
 }

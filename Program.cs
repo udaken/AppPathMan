@@ -14,6 +14,8 @@ namespace AppPathMan
         [STAThread]
         static void Main()
         {
+            Application.SetUnhandledExceptionMode(
+                UnhandledExceptionMode.CatchException);
 #if NETCOREAPP3_0 || NETCOREAPP3_1
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
 #endif

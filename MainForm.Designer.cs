@@ -31,6 +31,14 @@
             this.components = new System.ComponentModel.Container();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.NameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ValueButtonColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.PathColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PathButtonColumn = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.dropTargetDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.useUrlDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.appPathModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.listBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonRemove = new System.Windows.Forms.Button();
@@ -63,17 +71,9 @@
             this.dataGridViewButtonColumn11 = new System.Windows.Forms.DataGridViewButtonColumn();
             this.dataGridViewTextBoxColumn12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewButtonColumn12 = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.appPathModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.ValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ValueButtonColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.PathColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PathButtonColumn = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.dropTargetDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.useUrlDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.listBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.appPathModelBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -116,6 +116,72 @@
             this.NameColumn.MinimumWidth = 8;
             this.NameColumn.Name = "NameColumn";
             this.NameColumn.Width = 96;
+            // 
+            // ValueColumn
+            // 
+            this.ValueColumn.DataPropertyName = "Value";
+            this.ValueColumn.HeaderText = "Value";
+            this.ValueColumn.MinimumWidth = 8;
+            this.ValueColumn.Name = "ValueColumn";
+            this.ValueColumn.Width = 300;
+            // 
+            // ValueButtonColumn
+            // 
+            this.ValueButtonColumn.DataPropertyName = "Value";
+            this.ValueButtonColumn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.ValueButtonColumn.HeaderText = "...";
+            this.ValueButtonColumn.MinimumWidth = 8;
+            this.ValueButtonColumn.Name = "ValueButtonColumn";
+            this.ValueButtonColumn.UseColumnTextForButtonValue = true;
+            this.ValueButtonColumn.Width = 20;
+            // 
+            // PathColumn
+            // 
+            this.PathColumn.DataPropertyName = "Path";
+            this.PathColumn.HeaderText = "Path";
+            this.PathColumn.MinimumWidth = 8;
+            this.PathColumn.Name = "PathColumn";
+            this.PathColumn.Width = 300;
+            // 
+            // PathButtonColumn
+            // 
+            this.PathButtonColumn.DataPropertyName = "Path";
+            this.PathButtonColumn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.PathButtonColumn.HeaderText = "...";
+            this.PathButtonColumn.MinimumWidth = 8;
+            this.PathButtonColumn.Name = "PathButtonColumn";
+            this.PathButtonColumn.Text = "";
+            this.PathButtonColumn.UseColumnTextForButtonValue = true;
+            this.PathButtonColumn.Visible = false;
+            this.PathButtonColumn.Width = 20;
+            // 
+            // dropTargetDataGridViewTextBoxColumn
+            // 
+            this.dropTargetDataGridViewTextBoxColumn.DataPropertyName = "DropTarget";
+            this.dropTargetDataGridViewTextBoxColumn.HeaderText = "DropTarget";
+            this.dropTargetDataGridViewTextBoxColumn.MinimumWidth = 8;
+            this.dropTargetDataGridViewTextBoxColumn.Name = "dropTargetDataGridViewTextBoxColumn";
+            this.dropTargetDataGridViewTextBoxColumn.Width = 150;
+            // 
+            // useUrlDataGridViewTextBoxColumn
+            // 
+            this.useUrlDataGridViewTextBoxColumn.DataPropertyName = "UseUrl";
+            this.useUrlDataGridViewTextBoxColumn.HeaderText = "UseUrl";
+            this.useUrlDataGridViewTextBoxColumn.MinimumWidth = 8;
+            this.useUrlDataGridViewTextBoxColumn.Name = "useUrlDataGridViewTextBoxColumn";
+            this.useUrlDataGridViewTextBoxColumn.Width = 150;
+            // 
+            // dontUseDesktopChangeRouterDataGridViewTextBoxColumn
+            // 
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.DataPropertyName = "DontUseDesktopChangeRouter";
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.HeaderText = "DontUseDesktopChangeRouter";
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.MinimumWidth = 8;
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.Name = "dontUseDesktopChangeRouterDataGridViewTextBoxColumn";
+            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.Width = 150;
+            // 
+            // appPathModelBindingSource
+            // 
+            this.appPathModelBindingSource.DataSource = typeof(AppPathMan.AppPathModel);
             // 
             // listBindingSource
             // 
@@ -422,72 +488,6 @@
             this.dataGridViewButtonColumn12.Visible = false;
             this.dataGridViewButtonColumn12.Width = 20;
             // 
-            // appPathModelBindingSource
-            // 
-            this.appPathModelBindingSource.DataSource = typeof(AppPathMan.AppPathModel);
-            // 
-            // ValueColumn
-            // 
-            this.ValueColumn.DataPropertyName = "Value";
-            this.ValueColumn.HeaderText = "Value";
-            this.ValueColumn.MinimumWidth = 8;
-            this.ValueColumn.Name = "ValueColumn";
-            this.ValueColumn.Width = 300;
-            // 
-            // ValueButtonColumn
-            // 
-            this.ValueButtonColumn.DataPropertyName = "Value";
-            this.ValueButtonColumn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.ValueButtonColumn.HeaderText = "...";
-            this.ValueButtonColumn.MinimumWidth = 8;
-            this.ValueButtonColumn.Name = "ValueButtonColumn";
-            this.ValueButtonColumn.UseColumnTextForButtonValue = true;
-            this.ValueButtonColumn.Width = 20;
-            // 
-            // PathColumn
-            // 
-            this.PathColumn.DataPropertyName = "Path";
-            this.PathColumn.HeaderText = "Path";
-            this.PathColumn.MinimumWidth = 8;
-            this.PathColumn.Name = "PathColumn";
-            this.PathColumn.Width = 300;
-            // 
-            // PathButtonColumn
-            // 
-            this.PathButtonColumn.DataPropertyName = "Path";
-            this.PathButtonColumn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.PathButtonColumn.HeaderText = "...";
-            this.PathButtonColumn.MinimumWidth = 8;
-            this.PathButtonColumn.Name = "PathButtonColumn";
-            this.PathButtonColumn.Text = "";
-            this.PathButtonColumn.UseColumnTextForButtonValue = true;
-            this.PathButtonColumn.Visible = false;
-            this.PathButtonColumn.Width = 20;
-            // 
-            // dropTargetDataGridViewTextBoxColumn
-            // 
-            this.dropTargetDataGridViewTextBoxColumn.DataPropertyName = "DropTarget";
-            this.dropTargetDataGridViewTextBoxColumn.HeaderText = "DropTarget";
-            this.dropTargetDataGridViewTextBoxColumn.MinimumWidth = 8;
-            this.dropTargetDataGridViewTextBoxColumn.Name = "dropTargetDataGridViewTextBoxColumn";
-            this.dropTargetDataGridViewTextBoxColumn.Width = 150;
-            // 
-            // useUrlDataGridViewTextBoxColumn
-            // 
-            this.useUrlDataGridViewTextBoxColumn.DataPropertyName = "UseUrl";
-            this.useUrlDataGridViewTextBoxColumn.HeaderText = "UseUrl";
-            this.useUrlDataGridViewTextBoxColumn.MinimumWidth = 8;
-            this.useUrlDataGridViewTextBoxColumn.Name = "useUrlDataGridViewTextBoxColumn";
-            this.useUrlDataGridViewTextBoxColumn.Width = 150;
-            // 
-            // dontUseDesktopChangeRouterDataGridViewTextBoxColumn
-            // 
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.DataPropertyName = "DontUseDesktopChangeRouter";
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.HeaderText = "DontUseDesktopChangeRouter";
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.MinimumWidth = 8;
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.Name = "dontUseDesktopChangeRouterDataGridViewTextBoxColumn";
-            this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn.Width = 150;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
@@ -505,9 +505,10 @@
             this.MinimizeBox = false;
             this.Name = "MainForm";
             this.Text = "AppPathMan";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.listBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.appPathModelBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

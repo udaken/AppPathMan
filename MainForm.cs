@@ -9,24 +9,33 @@ namespace AppPathMan
 {
     public partial class MainForm : Form
     {
-        readonly AppPathModel model = new AppPathModel();
+        AppPathModel _Model;
         public MainForm()
         {
+
             InitializeComponent();
             dataGridView1.AutoGenerateColumns = false;
 
-            appPathModelBindingSource.DataSource = model;
         }
 
+        private void Model_AppPathKeyNotFoundEvent(object sender, AppPathKeyNotFoundEventArgs e)
+        {
+            if (MessageBox.Show(this, "`App Paths` key not found. Create Key?\n" + e.KeyName, this.Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                e.DoCreateKey = true;
+            }
+            else
+                this.Close();
+        }
 
         private void buttonExport_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.FileName = $"{model.RootKeyName}_AppPaths-{DateTime.Now:yyyy'-'MM'-'dd}.reg";
+            saveFileDialog1.FileName = $"{_Model.RootKeyName}_AppPaths-{DateTime.Now:yyyy'-'MM'-'dd}.reg";
             if (saveFileDialog1.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
-            var msg = model.Export(saveFileDialog1.FileName);
+            var msg = _Model.Export(saveFileDialog1.FileName);
             if (!string.IsNullOrEmpty(msg))
             {
                 MessageBox.Show(this, msg, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -47,8 +56,8 @@ namespace AppPathMan
             {
                 return;
             }
-            var item = AppPathInfo.Create(model.IsSystem, inputBox.Value);
-            model.List.Add(item);
+            var item = AppPathInfo.Create(_Model.IsSystem, inputBox.Value);
+            _Model.List.Add(item);
         }
 
         private void dataGridView1_CellParsing(object sender, DataGridViewCellParsingEventArgs e)
@@ -78,12 +87,12 @@ namespace AppPathMan
             var dataGridView = (DataGridView)sender;
             if (e.ColumnIndex == ValueButtonColumn.Index)
             {
-                string expandedString = model.List[e.RowIndex].Value.ExpandedString;
+                string expandedString = _Model.List[e.RowIndex].Value.ExpandedString;
                 openFileDialog1.InitialDirectory = System.IO.Path.GetDirectoryName(expandedString);
                 openFileDialog1.FileName = expandedString;
                 if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
                 {
-                    model.List[e.RowIndex].Value = openFileDialog1.FileName;
+                    _Model.List[e.RowIndex].Value = openFileDialog1.FileName;
                 }
             }
         }
@@ -92,10 +101,17 @@ namespace AppPathMan
         private void buttonRemove_Click(object sender, EventArgs e)
         {
             var index = dataGridView1.SelectedCells[0].RowIndex;
-            if (MessageBox.Show(this, $"Are you want to permanently delete this entry?\n\n{model.List[index].Name}", this.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show(this, $"Are you want to permanently delete this entry?\n\n{_Model.List[index].Name}", this.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                model.Remove(index);
+                _Model.Delete(index);
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            _Model = new AppPathModel(Model_AppPathKeyNotFoundEvent);
+            appPathModelBindingSource.DataSource = _Model;
+
         }
     }
 }
