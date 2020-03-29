@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace AppPathMan
 {
-    public class AppPathInfo : INotifyPropertyChanged, IEquatable<AppPathInfo>
+    public class AppPathInfo : INotifyPropertyChanged
     {
         public const string AppPathKeyName = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
         private const string DefaultValueName = "";
@@ -51,16 +51,17 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_Name != value)
+                if (_Name == value)
                 {
-                    using var appPathKey = OpenRegKeyForWrite(AppPathKeyName);
-                    var err = NativeMethods.RegRenameKey(appPathKey.Handle, _Name, value);
-                    if (err != 0)
-                        throw new Win32Exception(err);
-
-                    _Name = value;
-                    PropertyChanged?.Invoke(this, _NamePropertyChangedArgs);
+                    return;
                 }
+                using var appPathKey = OpenRegKeyForWrite(AppPathKeyName);
+                var err = NativeMethods.RegRenameKey(appPathKey.Handle, _Name, value);
+                if (err != 0)
+                    throw new Win32Exception(err);
+
+                _Name = value;
+                PropertyChanged?.Invoke(this, _NamePropertyChangedArgs);
             }
         }
 
@@ -70,12 +71,13 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_Value != value)
+                if (_Value == value)
                 {
-                    UpdateValue(DefaultValueName, value);
-                    _Value = value;
-                    PropertyChanged?.Invoke(this, _ValuePropertyChangedArgs);
+                    return;
                 }
+                UpdateValue(DefaultValueName, value);
+                _Value = value;
+                PropertyChanged?.Invoke(this, _ValuePropertyChangedArgs);
             }
         }
 
@@ -85,12 +87,13 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_Path != value)
+                if (_Path == value)
                 {
-                    UpdateValue(nameof(Path), value);
-                    _Path = value;
-                    PropertyChanged?.Invoke(this, _PathPropertyChangedArgs);
+                    return;
                 }
+                UpdateValue(nameof(Path), value);
+                _Path = value;
+                PropertyChanged?.Invoke(this, _PathPropertyChangedArgs);
             }
         }
 
@@ -100,12 +103,13 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_DropTarget != value)
+                if (_DropTarget == value)
                 {
-                    UpdateValue(nameof(DropTarget), value);
-                    _DropTarget = value;
-                    PropertyChanged?.Invoke(this, _DropTargetPropertyChangedArgs);
+                    return;
                 }
+                UpdateValue(nameof(DropTarget), value);
+                _DropTarget = value;
+                PropertyChanged?.Invoke(this, _DropTargetPropertyChangedArgs);
             }
         }
 
@@ -115,12 +119,13 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_UseUrl != value)
+                if (_UseUrl == value)
                 {
-                    UpdateValue(nameof(UseUrl), value);
-                    _UseUrl = value;
-                    PropertyChanged?.Invoke(this, _UseUrlPropertyChangedArgs);
+                    return;
                 }
+                UpdateValue(nameof(UseUrl), value);
+                _UseUrl = value;
+                PropertyChanged?.Invoke(this, _UseUrlPropertyChangedArgs);
             }
         }
 
@@ -130,12 +135,13 @@ namespace AppPathMan
             set
             {
                 CheckDisposed();
-                if (_DontUseDesktopChangeRouter != value)
+                if (_DontUseDesktopChangeRouter == value)
                 {
-                    UpdateValue(nameof(DontUseDesktopChangeRouter), value);
-                    _DontUseDesktopChangeRouter = value;
-                    PropertyChanged?.Invoke(this, _DontUseDesktopChangeRouterPropertyChangedArgs);
+                    return;
                 }
+                UpdateValue(nameof(DontUseDesktopChangeRouter), value);
+                _DontUseDesktopChangeRouter = value;
+                PropertyChanged?.Invoke(this, _DontUseDesktopChangeRouterPropertyChangedArgs);
             }
         }
 
@@ -165,7 +171,7 @@ namespace AppPathMan
             using var key = OpenRegKeyForWrite(AppPathKeyName + @"\" + Name);
 
             var converted = converter(value);
-            if (converted.value == null)
+            if (converted.value is null)
             {
                 if (ValueExist(key, name))
                     key.DeleteValue(name);
@@ -174,20 +180,11 @@ namespace AppPathMan
                 key.SetValue(name, converted.value, converted.kind);
         }
 
-        void UpdateValue(string name, RegSz value)
-        {
-            UpdateValueCore(name, value, v => (v.Value, v.IsExpandString ? RegistryValueKind.ExpandString : RegistryValueKind.String));
-        }
+        void UpdateValue(string name, RegSz value) => UpdateValueCore(name, value, v => (v.Value, v.IsExpandString ? RegistryValueKind.ExpandString : RegistryValueKind.String));
 
-        void UpdateValue(string name, string? value)
-        {
-            UpdateValueCore(name, value, v => (v, RegistryValueKind.String));
-        }
+        void UpdateValue(string name, string? value) => UpdateValueCore(name, value, v => (v, RegistryValueKind.String));
 
-        void UpdateValue<T>(string name, T? value) where T : struct
-        {
-            UpdateValueCore(name, value, v => (v ?? null, RegistryValueKind.Unknown));
-        }
+        void UpdateValue<T>(string name, T? value) where T : struct => UpdateValueCore(name, value, v => (v ?? null, RegistryValueKind.Unknown));
 
         static T? TryConvertTo<T>(object value) where T : struct => value is T b ? b : (T?)null;
 
@@ -196,7 +193,6 @@ namespace AppPathMan
         static RegSz GetRegSz(RegistryKey key, string name) => new RegSz(
             (string)key.GetValue(name, "", RegistryValueOptions.DoNotExpandEnvironmentNames),
             ValueExist(key, name) && key.GetValueKind(name) == RegistryValueKind.ExpandString);
-
 
         public static AppPathInfo Create(bool isSystem, string name, RegSz value = default, RegSz path = default, uint? useUrl = null)
         {
@@ -213,7 +209,7 @@ namespace AppPathMan
         public static AppPathInfo FromReg(bool isSystem, RegistryKey key, string name)
         {
             var value = GetRegSz(key, DefaultValueName);
-            if (value.Value == null)
+            if (value.Value is null)
                 throw new KeyNotFoundException();
 
             return new AppPathInfo(isSystem, name, value,
@@ -223,16 +219,5 @@ namespace AppPathMan
                 dontUseDesktopChangeRouter: TryConvertTo<uint>(key.GetValue(nameof(DontUseDesktopChangeRouter))));
         }
 
-        public bool Equals(AppPathInfo info)
-            => IsSystem == info.IsSystem && Name == info.Name && Value.Equals(info.Value) && Path.Equals(info.Path) && DropTarget == info.DropTarget && UseUrl == info.UseUrl && DontUseDesktopChangeRouter == info.DontUseDesktopChangeRouter;
-
-        public override bool Equals(object? obj) => obj is AppPathInfo info && Equals(info);
-
-        public override int GetHashCode()
-            => HashCode.Combine(IsSystem, Name, Value, Path, DropTarget, UseUrl, DontUseDesktopChangeRouter);
-
-        public static bool operator ==(AppPathInfo left, AppPathInfo right) => EqualityComparer<AppPathInfo>.Default.Equals(left, right);
-
-        public static bool operator !=(AppPathInfo left, AppPathInfo right) => !(left == right);
     }
 }

@@ -94,6 +94,7 @@
             this.dropTargetDataGridViewTextBoxColumn,
             this.useUrlDataGridViewTextBoxColumn,
             this.dontUseDesktopChangeRouterDataGridViewTextBoxColumn});
+            this.dataGridView1.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.appPathModelBindingSource, "IsEditable", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.dataGridView1.DataBindings.Add(new System.Windows.Forms.Binding("ReadOnly", this.appPathModelBindingSource, "ReadOnly", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.dataGridView1.DataSource = this.listBindingSource;
             this.dataGridView1.Location = new System.Drawing.Point(12, 21);

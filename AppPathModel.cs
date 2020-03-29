@@ -12,18 +12,21 @@ namespace AppPathMan
 {
     public class AppPathModel : INotifyPropertyChanged
     {
-        bool _IsSystem = false;
+        static readonly PropertyChangedEventArgs _IsEditablePropertyChangedArgs = new PropertyChangedEventArgs(nameof(IsEditable));
         static readonly PropertyChangedEventArgs _IsSystemPropertyChangedArgs = new PropertyChangedEventArgs(nameof(IsSystem));
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public event EventHandler<AppPathKeyNotFoundEventArgs>? AppPathKeyNotFoundEvent;
-
+        static readonly System.Security.Principal.WindowsPrincipal _Principal = new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent());
+        static readonly PropertyChangedEventArgs _ReadOnlyPropertyChangedArgs = new PropertyChangedEventArgs(nameof(ReadOnly));
+        bool _IsSystem = false;
         public AppPathModel(EventHandler<AppPathKeyNotFoundEventArgs>? appPathKeyNotFoundEvent = null)
         {
             AppPathKeyNotFoundEvent = appPathKeyNotFoundEvent;
             CopyTo(Load(), List);
         }
+
+        public event EventHandler<AppPathKeyNotFoundEventArgs>? AppPathKeyNotFoundEvent;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public bool IsEditable => IsSystem ? _Principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator) : true;
 
         public bool IsSystem
         {
@@ -42,55 +45,24 @@ namespace AppPathMan
                 }
             }
         }
-        public string RootKeyName => IsSystem ? "HKLM" : "HKCU";
-
         public BindingList<AppPathInfo> List { get; } = new BindingList<AppPathInfo>();
-
-        public List<AppPathInfo> Load()
+        public bool ReadOnly => !IsEditable;
+        public string RootKeyName => IsSystem ? "HKLM" : "HKCU";
+        public void Delete(int index)
         {
-            var rootKey = IsSystem ? Registry.LocalMachine : Registry.CurrentUser;
-
-            RegistryKey appPathKey;
-            using (appPathKey = rootKey.OpenSubKey(AppPathInfo.AppPathKeyName))
-            {
-                if (appPathKey == null)
-                {
-                    var e = new AppPathKeyNotFoundEventArgs(rootKey.Name + @"\" + AppPathInfo.AppPathKeyName) { };
-                    AppPathKeyNotFoundEvent?.Invoke(this, e);
-
-                    if (e.DoCreateKey)
-                        appPathKey = rootKey.CreateSubKey(AppPathInfo.AppPathKeyName);
-                }
-
-                if (appPathKey == null)
-                    throw new InvalidOperationException();
-
-                var list = new List<AppPathInfo>();
-                foreach (var name in appPathKey.GetSubKeyNames())
-                {
-                    using var key = appPathKey.OpenSubKey(name);
-                    list.Add(AppPathInfo.FromReg(IsSystem, key, name));
-                }
-
-                return list;
-            }
+            var item = List[index];
+            item.Delete();
+            List.RemoveAt(index);
         }
 
-        static void CopyTo<T>(IEnumerable<T> source, IList<T> dest)
-        {
-            foreach (var item in source)
-            {
-                dest.Add(item);
-            }
-        }
-
-        public string? Export(string filename)
+        public string? Export(string filename, IntPtr errorDialogParentHandle)
         {
             var startInfo = new ProcessStartInfo(Environment.ExpandEnvironmentVariables(@"%WINDIR%\system32\reg.exe"))
             {
                 Arguments = $"EXPORT \"{ RootKeyName + @"\" + AppPathInfo.AppPathKeyName}\" \"{filename}\" /y",
                 CreateNoWindow = true,
                 ErrorDialog = true,
+                ErrorDialogParentHandle = errorDialogParentHandle,
                 UseShellExecute = false,
                 RedirectStandardError = true,
             };
@@ -103,37 +75,60 @@ namespace AppPathMan
 
             return process.ExitCode != 0 ? process.StandardError.ReadToEnd() : null;
         }
-        public void Delete(int index)
+
+        private List<AppPathInfo> Load()
         {
-            var item = List[index];
-            item.Delete();
-            List.RemoveAt(index);
+            var rootKey = IsSystem ? Registry.LocalMachine : Registry.CurrentUser;
+
+            RegistryKey appPathKey;
+            using (appPathKey = rootKey.OpenSubKey(AppPathInfo.AppPathKeyName))
+            {
+                if (appPathKey == null)
+                {
+                    var e = new AppPathKeyNotFoundEventArgs(rootKey.Name + @"\" + AppPathInfo.AppPathKeyName);
+                    AppPathKeyNotFoundEvent?.Invoke(this, e);
+
+                    if (e.DoCreateKey)
+                        appPathKey = rootKey.CreateSubKey(AppPathInfo.AppPathKeyName);
+                }
+
+                if (appPathKey == null)
+                    throw new InvalidOperationException();
+
+                return appPathKey.GetSubKeyNames().Select(name =>
+                {
+                    using var key = appPathKey.OpenSubKey(name);
+                    return AppPathInfo.FromReg(IsSystem, key, name);
+                }).ToList();
+            }
         }
 
-        static readonly System.Security.Principal.WindowsPrincipal _Principal = new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent());
-        public bool IsEditable => IsSystem ? _Principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator) : true;
-        static readonly PropertyChangedEventArgs _IsEditablePropertyChangedArgs = new PropertyChangedEventArgs(nameof(IsEditable));
-        
-        public bool ReadOnly => !IsEditable;
-        static readonly PropertyChangedEventArgs _ReadOnlyPropertyChangedArgs = new PropertyChangedEventArgs(nameof(ReadOnly));
-
+        static void CopyTo<T>(IEnumerable<T> source, IList<T> dest)
+        {
+            foreach (var item in source)
+            {
+                dest.Add(item);
+            }
+        }
     }
     static class NativeMethods
     {
         [DllImport("advapi32", CharSet = CharSet.Unicode)]
         public static extern int RegRenameKey(SafeRegistryHandle hKey, string oldname, string newname);
     }
-
     public class AppPathKeyNotFoundEventArgs
     {
         internal AppPathKeyNotFoundEventArgs(string keyName) => KeyName = keyName;
+        public bool DoCreateKey
+        {
+            get;
+            set;
+        }
+
         public string KeyName
         {
             get;
         }
-        public bool DoCreateKey
-        {
-            get; set;
-        }
     }
+
 }

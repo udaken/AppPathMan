@@ -7,16 +7,21 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
 
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <!-- <PublishSingleFile>true</PublishSingleFile>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' And '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <PublishSingleFile>true</PublishSingleFile>
     <PublishTrimmed>true</PublishTrimmed>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
     <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
+    <PackageReference Include="Microsoft.DotNet.Framework.NativeImageCompiler" Version="1.0.0" Condition=" '$(TargetFramework)' == 'net472' And '$(Platform)' != 'AnyCPU' ">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,6 @@ namespace AppPathMan
             InitializeComponent();
             dataGridView1.AutoGenerateColumns = false;
             appPathModelBindingSource.DataSource = _Model;
-
         }
 
         private void Model_AppPathKeyNotFoundEvent(object? sender, AppPathKeyNotFoundEventArgs e)
@@ -36,7 +35,7 @@ namespace AppPathMan
             {
                 return;
             }
-            var msg = _Model.Export(saveFileDialog1.FileName);
+            var msg = _Model.Export(saveFileDialog1.FileName, this.Handle);
             if (!string.IsNullOrEmpty(msg))
             {
                 MessageBox.Show(this, msg, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -85,10 +84,9 @@ namespace AppPathMan
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            var dataGridView = (DataGridView)sender;
-            if (e.ColumnIndex == ValueButtonColumn.Index)
+            if (e.ColumnIndex == ValueButtonColumn.Index && _Model.IsEditable)
             {
-                string expandedString = _Model.List[e.RowIndex].Value.ExpandedString;
+                var expandedString = _Model.List[e.RowIndex].Value.ExpandedString;
                 openFileDialog1.InitialDirectory = System.IO.Path.GetDirectoryName(expandedString);
                 openFileDialog1.FileName = expandedString;
                 if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
